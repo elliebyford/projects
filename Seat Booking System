@@ -1,0 +1,338 @@
+import java.io.File;
+
+import java.io.FileNotFoundException;
+
+import java.io.FileReader;
+
+import java.io.FileWriter;
+
+import java.io.IOException;
+
+import java.util.Scanner;
+
+import java.util.ArrayList;
+
+import java.io.PrintWriter;
+
+//class for booking system
+
+public class seatBookingSystem {
+
+	private static final int Seat = 0;
+
+	private static ArrayList<Seat> arraySeatList = new ArrayList<Seat>();
+
+	public static void main(String[] args) throws IOException {
+
+		// read file into list of Seat objects
+
+		readSeats();
+
+		// display menu to user
+
+		displayMenu();
+
+	}
+// display menu method
+	private static void displayMenu() throws IOException {
+
+		boolean quit = false;
+
+		// repeating menu lists options to the user
+
+		while (!quit) {
+
+			System.out.println("--MAIN --");
+
+			System.out.println("1 Reserve a seat");
+
+			System.out.println("2 Cancel Seat");
+
+			System.out.println("3 View Seat Reservations");
+
+			System.out.println("4 Quit");
+
+			Scanner console = new Scanner(System.in);
+
+			String choice = console.next();
+
+			// options for menu
+
+			switch (choice) {
+
+			case "1":
+
+				// reserve a seat
+
+				reserveSeat();
+
+				break;
+
+			case "2":
+
+				// cancel a seat
+
+				cancelSeat();
+
+				break;
+
+			case "3":
+
+				// displays seat reservations
+
+				displaySeats();
+
+				break;
+
+			case "4":
+
+				// quit
+
+				quit = true;
+				saveReservations();
+				break;
+
+			}
+
+		}
+
+	}
+
+	// read method
+
+	private static void readSeats() throws FileNotFoundException {
+
+		File fileName = new File("data\\seats.txt");
+
+		// Creates a file reader object that uses the given file
+
+		FileReader file = new FileReader(fileName);
+
+		Scanner read = new Scanner(file);
+
+		// loops through lines in file and creates new Seat Class
+
+		while (read.hasNext()) {
+
+			Seat seat = new Seat(null, null, false, false, false, 0, null);
+
+			seat.seatNum = read.next();
+
+			seat.seatClass = read.next();
+
+			seat.isWindow = read.nextBoolean();
+
+			seat.isAisle = read.nextBoolean();
+
+			seat.isTable = read.nextBoolean();
+
+			seat.seatPrice = read.nextDouble();
+
+			seat.eMail = read.next();
+
+			arraySeatList.add(seat);
+
+		}
+
+	}
+
+	// method for displaying seat reservations
+
+	private static void displaySeats() throws IOException {
+
+		// loops through list of seat objects and prints details out
+
+		for (int i = 0; i < arraySeatList.size(); i++) {
+
+			Seat seat = arraySeatList.get(i);
+
+			System.out.print("Seat Num " + seat.seatNum);
+
+			System.out.print(" Seat Class " + seat.seatClass);
+
+			System.out.print(" Window Seat " + seat.isWindow);
+
+			System.out.print(" Aisle Seat " + seat.isAisle);
+
+			System.out.print(" Table Seat " + seat.isTable);
+			System.out.println(" e " + seat.eMail);
+
+		}
+
+	}
+
+	// method for reserving seats
+
+	private static void reserveSeat() throws IOException {
+
+		Scanner console = new Scanner(System.in);
+
+		// ask user for options
+
+		System.out.println("Enter Class (1ST/STD) ");
+
+		String classChoice = console.next();
+
+		System.out.println("Enter Window (Y/N");
+
+		String winChoice = console.next();
+
+		boolean windowRequired = false;
+
+		System.out.println("Enter Aisle (Y/N");
+
+		String aisleChoice = console.next();
+
+		boolean aisleRequired = false;
+
+		System.out.println("Enter Table (Y/N");
+
+		String tabChoice = console.next();
+
+		boolean tabRequired = false;
+
+		if (winChoice.toLowerCase().startsWith("y"))
+
+			windowRequired = true;
+
+		// adds data from user input to array
+
+		ArrayList<Seat> matches = new ArrayList<>();
+
+		for (int i = 0; i < arraySeatList.size(); i++) {
+
+			Seat seat = arraySeatList.get(i);
+
+			if (seat.eMail.equals("free") && seat.seatClass.equalsIgnoreCase(classChoice)
+
+					&& seat.isWindow == windowRequired) {
+
+				matches.add(seat);
+
+			}
+
+		}
+
+		// matches user to a seat
+
+		for (Seat seat : matches) {
+
+			System.out.println(seat);
+
+		}
+
+		System.out.println("Enter Seat Number");
+
+		String choice = console.next();
+
+		System.out.println("Enter Email");
+
+		String email = console.next();
+
+		System.out.println("Your seat is reserved");
+
+
+		Seat chosenSeat = null;
+
+		int chosenIndex = 0;
+
+		for (Seat seat : matches) {
+
+			if (seat.seatNum.equalsIgnoreCase(choice)) {
+
+				chosenSeat = seat;
+
+				chosenSeat.eMail = email;
+
+				break;
+
+			}
+
+		}
+
+		if (chosenSeat != null) {
+
+
+		}
+
+		else {
+
+			System.out.println("Sorry, that seat wasn't available");
+
+		}
+
+	}
+
+	// method to cancel a seat reservation
+
+	private static void cancelSeat() {
+
+		boolean removeSeat;
+
+		Scanner console = new Scanner(System.in);
+
+		System.out.println("Would you like to cancel your seat reservation?(Y/N");
+
+		String answer = console.next();
+
+		System.out.println("Please enter your email address");
+
+		String eMail = console.next();
+
+		if (answer.toLowerCase().startsWith("y"))
+
+			removeSeat = true;
+
+		if (answer.toLowerCase().startsWith("n"))
+
+			removeSeat = false;
+
+		ArrayList<Seat> matches = new ArrayList<>();
+
+		for (int i = 0; i < arraySeatList.size(); i++) {
+
+			Seat seat = arraySeatList.get(i);
+
+			if (seat.eMail.equalsIgnoreCase(eMail)) {
+
+				seat.eMail = "free";
+				matches.add(seat);
+			}
+
+		}
+
+		System.out.println("Your seat reservation has been cancelled - no of seats : " + matches.size());
+
+	}
+
+	// saves data back to the file
+
+	private static void saveReservations() throws IOException {
+
+		// rebuilds text line by line from array of seat objects
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < arraySeatList.size(); i++) {
+
+			Seat seat = arraySeatList.get(i);
+
+			sb.append(seat.seatNum + " " + seat.seatClass + " " + seat.isWindow + " " + seat.isAisle + " "
+
+					+ seat.isTable + " " + seat.seatPrice + " " + seat.eMail);
+
+			sb.append(System.getProperty("line.separator"));
+
+		}
+
+		// Overwrites file with updated text
+
+		FileWriter writer = new FileWriter("M:\\eclipse-oxygen\\Seat Booking System\\data\\seats.txt");
+
+		writer.write(sb.toString());
+
+		writer.close();
+
+	}
+
+}
